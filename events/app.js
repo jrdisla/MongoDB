@@ -81,27 +81,28 @@ app.set('view engine', 'ejs');
 var registryDox = "[]";
 var zipAggDox = "[]";
 
-// var registryAggregate = function(db, callback){
-//     db.collection('registry').aggregate(
-//         [{"$group" : {"_id" : "$user.email", "attending" : { "$addToSet" : "$event.name" }}}, {"$sort" : {"_id" : 1 }}]
-//     ).toArray(function(err, result) {
-//      console.log(result);
-//      registryDox = result;
-//   });
-// }
+var registryAggregate = function(db, callback){
+    db.collection('Hola').aggregate(
+        [{"$group" : {"_id" : "$user.email", "attending" : { "$addToSet" : "$event.name" }}},
+            {"$sort" : {"_id" : 1 }}]
+    ).toArray(function(err, result) {
+     console.log(result);
+     registryDox = result;
+  });
+}
 
-// var zipAggregate = function(db, callback){
-//     db.collection('registry').aggregate(
-//         [    
-//             {"$project" : { "ZIP_CODE" : "$event.location.zip", "EVENT_NAME":"$event.name"}},
-//             {"$group" : {"_id" : "$ZIP_CODE", "Attending" : { "$sum" : 1}}},
-//  		    {"$sort" : {"Attending" : -1 }}
-// 		]
-//     ).toArray(function(err, result) {
-//      console.log(result);
-//      zipAggDox = result;
-//   });
-// }
+var zipAggregate = function(db, callback){
+    db.collection('Hola').aggregate(
+        [
+            {"$project" : { "ZIP_CODE" : "$event.location.zip", "EVENT_NAME":"$event.name"}},
+            {"$group" : {"_id" : "$ZIP_CODE", "Attending" : { "$sum" : 1}}},
+ 		    {"$sort" : {"Attending" : -1 }}
+		]
+    ).toArray(function(err, result) {
+     console.log(result);
+     zipAggDox = result;
+  });
+}
 
 app.get('/', function(req, res){
     var url = 'mongodb://localhost:27017/eventApp';
@@ -111,11 +112,12 @@ app.get('/', function(req, res){
         var usersAll = "[]";
         
         
-//        registryAggregate(db, function() { });
-//        zipAggregate(db, function() { });
-        
+       registryAggregate(db, function() { });
+       zipAggregate(db, function() { });
+        console.log('hola')
         usersCol.find({}).toArray( function(err, results) {
             usersAll = results;
+            console.log(usersAll);
         });
         
         eventsCol.find({}).toArray( function (err, results) {
